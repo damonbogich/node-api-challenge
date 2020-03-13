@@ -10,7 +10,7 @@ router.post("/", (req, res) => {
     const newProject = req.body;
     projectHubs.insert(newProject)
     .then(project => {
-        if(!project) {
+        if(!newProject) {
             res.status(400).json({message: "please provide new project"})
         } else if (!project.name || !project.description){
             res.status(400).json({message: "please provide both project name and description"})
@@ -38,7 +38,7 @@ router.get('/:id', (req, res) => {
 
     projectHubs.get(id)
     .then(proj => {
-        if (proj.id != id) {
+        if (!proj) {
             res.status(400).json({message: "project with given id does not exist"})
         } else {
             res.status(200).json(proj)
@@ -56,14 +56,17 @@ router.put('/:id', (req, res) => {
     const {id} = req.params;
     const proj = req.body;
 
-    projectHubs.update(id, proj)
-    .then(updated => {
-        if(!updated) {
+    projectHubs.get(id)
+    .then(project => {
+        if(!project) {
             res.status(400).json({message: "please add info to your request"})
-        } else if (!proj.name || !proj.description) {
+        }  else if (!proj.name || !proj.description) {
             res.status(400).json({message: "please add name and description"})
         } else {
-            res.status(200).json(proj)
+            projectHubs.update(id, proj)
+            .then(updated => {
+                res.status(200).json(proj)
+            })
         }
     }) 
     .catch(err => {
@@ -78,16 +81,22 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
     const {id} = req.params;
 
-    projectHubs.remove(id)
+    projectHubs.get(id)
     .then(deleted => {
-        if(deleted.id === !id){
+        if(!deleted){
             res.status(400).json({err: "project with that id doesnn't exist"})
         } else {
-            res.status(200).json(deleted)
+            projectHubs.remove(id)
+            .then(deletedProj => {
+                res.status(200).json(deletedProj)
+            })
+            .catch(err => {
+                res.status(500).json({err: "server error deleting"})
+            })
         }
     })
     .catch(err => {
-        res.status(500).json({err: "server err"})
+        res.status(500).json({err: "server err finding project"})
     })
 })
 

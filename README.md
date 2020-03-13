@@ -39,14 +39,26 @@ Commit your code regularly and use descriptive messages. This helps both you (in
 Demonstrate your understanding of this Sprint's concepts by answering the following free-form questions. Edit this document to include your answers after each question. Make sure to leave a blank line above and below your answer so it is clear and easy to read by your Team Lead.
 
 - [ ] Mention two parts of Express that you learned about this week.
+    MiddleWare: Express’ middleware stack is basically an array of functions.
+  Routing: Routing is a way to select which request handler function is executed. 
 
 - [ ] Describe Middleware?
 
+They are implemented as small functions that handle one aspect of our application. Tasks like authentication and logging are commonly handled by middleware.  We created middleware functions that could be reused in our ajax requests. 
+
 - [ ] Describe a Resource?
+
+    * each resource is accessible via a unique URI.
+    * resources can have multiple representations.
+    * resource management happens via HTTP methods.
 
 - [ ] What can the API return to help clients know if a request was successful?
 
+    It can return a successful response code
+
 - [ ] How can we partition our application into sub-applications?
+
+    We can set up different routes to handle different requests to different parts of the app
 
 ## Minimum Viable Product
 

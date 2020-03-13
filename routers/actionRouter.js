@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
     })
 })
 
-//get actions by projectid
+//get actions by id
 
 router.get('/:id', (req, res) => {
     const {id} = req.params;
@@ -45,41 +45,60 @@ router.get('/:id', (req, res) => {
 
 //edit action by id:
 
-router.put('/:id', (req, res) => {
-    const {id} = req.params;
-    const action = req.body;
+router.put("/:id", (req, res) => {
+    const change = req.body
+    const {id} = req.params
 
-    actionHubs.update(id, action)
-    .then(edited => {
-        if(!action) {
-            res.status(400).json({err: "please enter action"})
+    actionHubs.get(id)
+    .then(action => {
+        if(!action){
+            res.status(400).json({message: "action with that id does not exist"})
+        } else if(!change){
+            res.status(400).json({message: "please enter in the changes you'd like to make"})
         } else if(!action.project_id || !action.description || !action.notes){
-            res.status(400).json({err: "please add all required fields"})
-        } else {
-            res.status(201).json(action);
+            res.status(400).json({message: "please enter all required action fields"})
         }
-    })
-    .catch(err => {
-        console.log(err)
-        res.status(500).json({err: "server error"})
-    })
+        else {
+            actionHubs.update(id, change)
+            .then(updated => {
+                res.status(200).json(updated)
+            })
+            .catch(err => {
+                console.log(err)
+                res.status(500).json({message: "error updating"})
+            })
+        }
+})
+.catch(err => {
+    console.log(err)
+    res.status(500).json({message: "server error"})
+})
 })
 
 //delete an action:
 
-router.delete('/:id', (req, res) => {
-    const {id} = req.params;
+router.delete("/:id", (req, res) => {
+    const {id} = req.params
 
-    actionHubs.remove(id)
-    .then(deleted => {
-        if(!deleted) {
-            res.status(400).json({err: "action with that id does not exist"})
-        } else {
-            res.status(200).json(deleted)
+    actionHubs.get(id)
+    .then(action => {
+        if(!action){
+            res.status(400).json({message: "action with that id does not exist"})
+        } 
+        else {
+            actionHubs.remove(id)
+            .then(deletedAction => {
+                res.status(200).json(deletedAction)
+            })
+            .catch(err => {
+                console.log(err)
+                res.status(500).json({message: "server error deleting action"})
+            })
         }
     })
     .catch(err => {
-        res.status(500).json({err: "server error"})
+        console.log(err)
+        res.status(500).json({message: "server error finding the action you want to delete"})
     })
 })
 
